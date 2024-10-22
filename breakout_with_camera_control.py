@@ -62,6 +62,10 @@ def process_frame():
     
     # Find contours of the object
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Show the frame and the mask (for debugging purposes)
+    cv2.imshow('Webcam', frame)  # Show the actual camera feed
+    cv2.imshow('Mask', mask)  # Show the mask after segmentation
     
     # Find the largest contour by area (assuming it's the object of interest)
     if contours:
@@ -70,6 +74,7 @@ def process_frame():
         if M["m00"] > 0:
             # Calculate the center of the object
             cx = int(M["m10"] / M["m00"])
+            print(f"Object X Coordinate: {cx}")  # Print x-coordinate for debugging
             return cx  # Return x-coordinate of the object's center
     
     return None
