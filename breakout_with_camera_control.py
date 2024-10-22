@@ -42,31 +42,46 @@ if not cap.isOpened():
 
 # Define color range for segmentation (adjust for your cellphone color)
 # For a baby blue cellphone, you may need to adjust these values.
-lower_color = np.array([100, 150, 0])  # Lower bound for HSV (example: baby blue)
-upper_color = np.array([140, 255, 255])  # Upper bound for HSV
+lower_blue = np.array([100, 150, 0])  # Lower bound for HSV (example: baby blue)
+upper_blue = np.array([140, 255, 255])  # Upper bound for HSV
+
+lower_red1 = np.array([0, 120, 70])
+upper_red1 = np.array([10, 255, 255])
+lower_red2 = np.array([170, 120, 70])
+upper_red2 = np.array([180, 255, 255])
 
 # Function to process the webcam input
 def process_frame():
     ret, frame = cap.read()
     if not ret:
         return None
-    
+
     # Flip frame to avoid mirrored view
     frame = cv2.flip(frame, 1)
-    
+
     # Convert frame to HSV
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    
-    # Create mask for detecting the object by color
-    mask = cv2.inRange(hsv_frame, lower_color, upper_color)
-    
+
+    # Create mask for blue
+    mask_blue = cv2.inRange(hsv_frame, lower_blue, upper_blue)
+
+    # Create two masks for red color
+    mask_red1 = cv2.inRange(hsv_frame, lower_red1, upper_red1)
+    mask_red2 = cv2.inRange(hsv_frame, lower_red2, upper_red2)
+
+    # Combine the two red masks
+    mask_red = mask_red1 + mask_red2
+
+    # Combine blue and red masks
+    mask = mask_blue + mask_red
+
     # Find contours of the object
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Show the frame and the mask (for debugging purposes)
     cv2.imshow('Webcam', frame)  # Show the actual camera feed
     cv2.imshow('Mask', mask)  # Show the mask after segmentation
-    
+
     # Find the largest contour by area (assuming it's the object of interest)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
@@ -76,7 +91,7 @@ def process_frame():
             cx = int(M["m10"] / M["m00"])
             print(f"Object X Coordinate: {cx}")  # Print x-coordinate for debugging
             return cx  # Return x-coordinate of the object's center
-    
+
     return None
 
 # Function for outputting text onto the screen
@@ -203,12 +218,12 @@ ball = GameBall(player_paddle.x + (player_paddle.width // 2), player_paddle.y - 
 run = True
 while run:
     clock.tick(fps)
-    
+
     # Process camera input
     object_x = process_frame()
-    
+
     screen.fill(bg)
-    
+
     # Draw all objects
     wall.draw_wall()
     player_paddle.draw()
