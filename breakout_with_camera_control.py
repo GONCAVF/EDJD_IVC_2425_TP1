@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from camera_processing import process_frame, release_camera  # Importa as funções de visão por computador
+from camera_processing import process_frame, release_camera
 
 pygame.init()
 
@@ -18,8 +18,8 @@ bg = (234, 218, 184)
 block_red = (242, 85, 96)
 block_green = (86, 174, 87)
 block_blue = (69, 177, 232)
-paddle_red = (242, 85, 96)  # Paddle vermelho
-paddle_green = (86, 174, 87)  # Paddle verde
+paddle_red = (242, 85, 96)
+paddle_green = (86, 174, 87)
 paddle_outline = (100, 100, 100)
 text_col = (78, 81, 139)
 
@@ -41,7 +41,7 @@ class Paddle:
     def __init__(self, color):
         self.width = int(screen_width / cols)
         self.height = 20
-        self.color = color  # Cor do paddle
+        self.color = color
         self.reset()
 
     def move(self, object_x):
@@ -59,7 +59,7 @@ class Paddle:
 
     def reset(self):
         self.x = int((screen_width / 2) - (self.width / 2))
-        self.y = screen_height - (self.height * 2)  # Mantém ambos os paddles na mesma altura
+        self.y = screen_height - (self.height * 2)
         self.rect = Rect(self.x, self.y, self.width, self.height)
 
 # GameBall class
@@ -98,10 +98,10 @@ class GameBall:
             for block in row:
                 if self.rect.colliderect(block[0]):
                     # Destroy block by reducing its strength
-                    self.speed_y *= -1  # Bounce the ball
+                    self.speed_y *= -1
                     block[1] -= 1
                     if block[1] <= 0:
-                        row.remove(block)  # Remove block if strength is zero or less
+                        row.remove(block)
 
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
@@ -187,7 +187,7 @@ while run:
             draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
         ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
         player_paddle.reset()
-        second_paddle.reset()  # Reseta a posição do segundo paddle
+        second_paddle.reset()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
