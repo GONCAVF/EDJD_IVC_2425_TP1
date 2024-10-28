@@ -156,7 +156,7 @@ while run:
     clock.tick(fps)
 
     # Process camera input
-    object_x = process_frame()
+    object_x, _ = process_frame()  # Ignora o mask retornado
 
     screen.fill(bg)
 

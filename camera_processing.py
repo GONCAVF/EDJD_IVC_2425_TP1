@@ -9,9 +9,9 @@ if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
 
-# Define color range for segmentation (adjust for green color)
-lower_green = np.array([35, 100, 100])  # Lower bound for HSV (example for green)
-upper_green = np.array([85, 255, 255])  # Upper bound for HSV
+# Color range for segmentation
+lower_green = np.array([35, 100, 100])
+upper_green = np.array([85, 255, 255])
 
 lower_red1 = np.array([0, 120, 70])
 upper_red1 = np.array([10, 255, 255])
