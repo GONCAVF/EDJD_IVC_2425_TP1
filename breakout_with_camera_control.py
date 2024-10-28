@@ -18,7 +18,8 @@ bg = (234, 218, 184)
 block_red = (242, 85, 96)
 block_green = (86, 174, 87)
 block_blue = (69, 177, 232)
-paddle_col = (142, 135, 123)
+paddle_red = (242, 85, 96)  # Paddle vermelho
+paddle_green = (86, 174, 87)  # Paddle verde
 paddle_outline = (100, 100, 100)
 text_col = (78, 81, 139)
 
@@ -37,15 +38,14 @@ def draw_text(text, font, text_col, x, y):
 
 # Paddle class
 class Paddle:
-    def __init__(self):
+    def __init__(self, color):
         self.width = int(screen_width / cols)
         self.height = 20
+        self.color = color  # Cor do paddle
         self.reset()
 
     def move(self, object_x):
         if object_x is not None:
-            # Adjust paddle position based on object detected
-            # Mapping the object's x-coordinate to the paddle's position
             self.rect.x = object_x - (self.width // 2)
         # Ensure paddle stays within screen bounds
         if self.rect.left < 0:
@@ -54,12 +54,12 @@ class Paddle:
             self.rect.right = screen_width
 
     def draw(self):
-        pygame.draw.rect(screen, paddle_col, self.rect)
+        pygame.draw.rect(screen, self.color, self.rect)
         pygame.draw.rect(screen, paddle_outline, self.rect, 3)
 
     def reset(self):
         self.x = int((screen_width / 2) - (self.width / 2))
-        self.y = screen_height - (self.height * 2)
+        self.y = screen_height - (self.height * 2)  # Mantém ambos os paddles na mesma altura
         self.rect = Rect(self.x, self.y, self.width, self.height)
 
 # GameBall class
@@ -85,9 +85,12 @@ class GameBall:
         if self.rect.bottom > screen_height:
             self.game_over = -1
 
-        # Collision with paddle
+        # Collision with paddles
         if self.rect.colliderect(player_paddle.rect):
             if abs(self.rect.bottom - player_paddle.rect.top) < 5 and self.speed_y > 0:
+                self.speed_y *= -1
+        if self.rect.colliderect(second_paddle.rect):
+            if abs(self.rect.bottom - second_paddle.rect.top) < 5 and self.speed_y > 0:
                 self.speed_y *= -1
 
         # Collision with blocks (check each block in the wall)
@@ -105,7 +108,7 @@ class GameBall:
         return self.game_over
 
     def draw(self):
-        pygame.draw.circle(screen, paddle_col, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad)
+        pygame.draw.circle(screen, paddle_red, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad)
         pygame.draw.circle(screen, paddle_outline, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad, 3)
 
     def reset(self, x, y):
@@ -144,8 +147,9 @@ class Wall:
 wall = Wall()
 wall.create_wall()
 
-# Create paddle
-player_paddle = Paddle()
+# Create paddles
+player_paddle = Paddle(paddle_red)
+second_paddle = Paddle(paddle_green)
 
 # Create ball
 ball = GameBall(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
@@ -156,17 +160,20 @@ while run:
     clock.tick(fps)
 
     # Process camera input
-    object_x, _ = process_frame()  # Ignora o mask retornado
+    object_x_red, object_x_green = process_frame()
 
     screen.fill(bg)
 
     # Draw all objects
     wall.draw_wall()
     player_paddle.draw()
+    second_paddle.draw()
     ball.draw()
 
     if live_ball:
-        player_paddle.move(object_x)
+        # Move paddles based on detected colors
+        player_paddle.move(object_x_red)  # Paddle vermelho
+        second_paddle.move(object_x_green)  # Paddle verde
         game_over = ball.move()
         if game_over != 0:
             live_ball = False
@@ -180,6 +187,7 @@ while run:
             draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
         ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
         player_paddle.reset()
+        second_paddle.reset()  # Reseta a posição do segundo paddle
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

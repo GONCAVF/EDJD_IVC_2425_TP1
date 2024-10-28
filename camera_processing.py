@@ -24,48 +24,47 @@ def process_frame():
     if not ret:
         return None, None
 
-    # Flip frame to avoid mirrored view
     frame = cv2.flip(frame, 1)
 
-    # Convert frame to HSV
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Create mask for green
+    # Create masks for red and green colors
     mask_green = cv2.inRange(hsv_frame, lower_green, upper_green)
 
-    # Create two masks for red color
     mask_red1 = cv2.inRange(hsv_frame, lower_red1, upper_red1)
     mask_red2 = cv2.inRange(hsv_frame, lower_red2, upper_red2)
 
-    # Combine the two red masks
+    # Combine masks
     mask_red = mask_red1 + mask_red2
 
-    # Combine green and red masks
-    mask = mask_green + mask_red
+    # contours
+    contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours_red, _ = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Show the original frame and the combined mask
-    cv2.imshow('Webcam', frame)  # Original webcam feed
-    cv2.imshow('Mask', mask)     # Mask window already implemented
+    # Find the largest contour for red and green
+    object_x_red = None
+    object_x_green = None
 
-    # New window to show the segmentation result
-    segmentation_result = cv2.bitwise_and(frame, frame, mask=mask)
-    cv2.imshow('Segmentation Result', segmentation_result)  # Shows only detected colors
+    # Get the center x-coordinate for the red object
+    if contours_red:
+        largest_contour_red = max(contours_red, key=cv2.contourArea)
+        if cv2.contourArea(largest_contour_red) > 500:
+            x, y, w, h = cv2.boundingRect(largest_contour_red)
+            object_x_red = x + (w // 2)
 
-    # Find contours of the object
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Get the center x-coordinate for the green object
+    if contours_green:
+        largest_contour_green = max(contours_green, key=cv2.contourArea)
+        if cv2.contourArea(largest_contour_green) > 500:
+            x, y, w, h = cv2.boundingRect(largest_contour_green)
+            object_x_green = x + (w // 2)
 
-    object_x = None  # Default to None if no object is detected
+    # Show the original frame with the masks
+    cv2.imshow("Frame", frame)
+    cv2.imshow("Mask Red", mask_red)
+    cv2.imshow("Mask Green", mask_green)
 
-    # Find the largest contour by area (assuming it's the object of interest)
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
-        M = cv2.moments(largest_contour)
-        if M["m00"] > 0:
-            # Calculate the center of the object
-            cx = int(M["m10"] / M["m00"])
-            object_x = cx  # X-coordinate of the object's center
-
-    return object_x, mask  # Return x-coordinate and the mask for additional processing
+    return object_x_red, object_x_green
 
 def release_camera():
     cap.release()
