@@ -86,8 +86,8 @@ class GameBall:
             self.game_over = -1
 
         # Collision with paddles
-        if self.rect.colliderect(player_paddle.rect):
-            if abs(self.rect.bottom - player_paddle.rect.top) < 5 and self.speed_y > 0:
+        if self.rect.colliderect(first_paddle.rect):
+            if abs(self.rect.bottom - first_paddle.rect.top) < 5 and self.speed_y > 0:
                 self.speed_y *= -1
         if self.rect.colliderect(second_paddle.rect):
             if abs(self.rect.bottom - second_paddle.rect.top) < 5 and self.speed_y > 0:
@@ -148,11 +148,11 @@ wall = Wall()
 wall.create_wall()
 
 # Create paddles
-player_paddle = Paddle(paddle_red)
+first_paddle = Paddle(paddle_red)
 second_paddle = Paddle(paddle_green)
 
 # Create ball
-ball = GameBall(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
+ball = GameBall(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
 
 # Main game loop
 run = True
@@ -166,14 +166,14 @@ while run:
 
     # Draw all objects
     wall.draw_wall()
-    player_paddle.draw()
+    first_paddle.draw()
     second_paddle.draw()
     ball.draw()
 
     if live_ball:
         # Move paddles based on detected colors
-        player_paddle.move(object_x_red)  # Paddle vermelho
-        second_paddle.move(object_x_green)  # Paddle verde
+        first_paddle.move(object_x_red)
+        second_paddle.move(object_x_green)
         game_over = ball.move()
         if game_over != 0:
             live_ball = False
@@ -185,8 +185,8 @@ while run:
         elif game_over == -1:
             draw_text('GAME OVER!', font, text_col, 240, screen_height // 2 + 50)
             draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-        ball.reset(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
-        player_paddle.reset()
+        ball.reset(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
+        first_paddle.reset()
         second_paddle.reset()
 
     for event in pygame.event.get():

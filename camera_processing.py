@@ -41,25 +41,24 @@ def process_frame():
     contours_green, _ = cv2.findContours(mask_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_red, _ = cv2.findContours(mask_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Find the largest contour for red and green
+    # Largest contour for red and green
     object_x_red = None
     object_x_green = None
 
-    # Get the center x-coordinate for the red object
+    # x-coordinate for the red object
     if contours_red:
         largest_contour_red = max(contours_red, key=cv2.contourArea)
         if cv2.contourArea(largest_contour_red) > 500:
             x, y, w, h = cv2.boundingRect(largest_contour_red)
             object_x_red = x + (w // 2)
 
-    # Get the center x-coordinate for the green object
+    # x-coordinate for the green object
     if contours_green:
         largest_contour_green = max(contours_green, key=cv2.contourArea)
         if cv2.contourArea(largest_contour_green) > 500:
             x, y, w, h = cv2.boundingRect(largest_contour_green)
             object_x_green = x + (w // 2)
 
-    # Show the original frame with the masks
     cv2.imshow("Frame", frame)
     cv2.imshow("Mask Red", mask_red)
     cv2.imshow("Mask Green", mask_green)
