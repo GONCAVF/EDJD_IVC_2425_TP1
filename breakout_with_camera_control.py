@@ -20,6 +20,7 @@ block_green = (86, 174, 87)
 block_blue = (69, 177, 232)
 paddle_red = (242, 85, 96)
 paddle_green = (86, 174, 87)
+paddle_blue = (69, 177, 232)
 paddle_outline = (100, 100, 100)
 text_col = (78, 81, 139)
 
@@ -149,7 +150,7 @@ wall.create_wall()
 
 # Create paddles
 first_paddle = Paddle(paddle_red)
-second_paddle = Paddle(paddle_green)
+second_paddle = Paddle(paddle_blue)
 
 # Create ball
 ball = GameBall(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
@@ -160,7 +161,7 @@ while run:
     clock.tick(fps)
 
     # Process camera input
-    object_x_red, object_x_green = process_frame()
+    object_x_red, object_x_green, object_x_blue = process_frame()
 
     screen.fill(bg)
 
@@ -173,7 +174,7 @@ while run:
     if live_ball:
         # Move paddles based on detected colors
         first_paddle.move(object_x_red)
-        second_paddle.move(object_x_green)
+        second_paddle.move(object_x_blue)
         game_over = ball.move()
         if game_over != 0:
             live_ball = False
