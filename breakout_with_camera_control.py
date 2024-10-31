@@ -206,13 +206,14 @@ while run:
     if not live_ball:
         if game_over == 0:
             if num_players == 1:
-                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
-                draw_text('COLOR GREEN PLAYING', font, text_col, 100, screen_height // 2 + 170)
+                draw_text('CLICAR PARA COMEÇAR', font, text_col, 140, screen_height // 2 + 80)
+                draw_text('COR VERDE A JOGAR', font, text_col, 140, screen_height // 2 + 130)
             else:
-                draw_text('CLICK ANYWHERE TO START, COLOR GREEN AND BLUE PLAYING', font, text_col, 100, screen_height // 2 + 100)
+                draw_text('CLICAR PARA COMEÇAR', font, text_col, 140, screen_height // 2 + 80)
+                draw_text('COR VERDE E AZUL A JOGAR', font, text_col, 140, screen_height // 2 + 130)
         elif game_over == -1:
-            draw_text('GAME OVER!', font, text_col, 240, screen_height // 2 + 50)
-            draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+            draw_text('FIM DO JOGO!', font, text_col, 240, screen_height // 2 + 50)
+            draw_text('CLICAR PARA COMEÇAR', font, text_col, 100, screen_height // 2 + 100)
         ball.reset(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
         first_paddle.reset()
         if cam2:
