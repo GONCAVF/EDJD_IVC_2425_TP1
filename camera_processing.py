@@ -47,7 +47,7 @@ def process_frame(cam, cam2=None):
     # contours frame2
     if cam2:
         contours_green2, _ = cv2.findContours(mask_green2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours_blue2, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours_blue2, _ = cv2.findContours(mask_blue2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         contours_blue, _ = cv2.findContours(mask_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Largest contour for green and blue
@@ -72,9 +72,9 @@ def process_frame(cam, cam2=None):
 
         # x-coordinate for the green object frame2
         if contours_blue2:
-            largest_contour_Blue = max(contours_blue2, key=cv2.contourArea)
-            if cv2.contourArea(largest_contour_Blue) > 500:
-                x, y, w, h = cv2.boundingRect(largest_contour_Blue)
+            largest_contour_blue2 = max(contours_blue2, key=cv2.contourArea)
+            if cv2.contourArea(largest_contour_blue2) > 500:
+                x, y, w, h = cv2.boundingRect(largest_contour_blue2)
                 object_x_blue = x + (w // 2)
 
         # x-coordinate for the blue object frame
@@ -90,7 +90,7 @@ def process_frame(cam, cam2=None):
     if cam2:
         cv2.imshow("Frame2", frame2)
         cv2.imshow("Mask Green2", mask_green2)
-        cv2.imshow("Mask Blue2", mask_blue2)
+        cv2.imshow("Mask blue2", mask_blue2)
         cv2.imshow("Mask Blue", mask_blue)
 
     if cam2:
