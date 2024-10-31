@@ -17,6 +17,7 @@ def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
+# Menu
 def menu_inicial():
     while True:
         screen.fill(bg)
