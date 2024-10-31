@@ -1,7 +1,4 @@
 import pygame
-import os
-from colorama.ansi import clear_screen
-from pygame.event import clear
 from pygame.locals import *
 from camera_processing import process_frame, release_camera, initializate_cameras
 
