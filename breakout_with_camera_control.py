@@ -1,6 +1,23 @@
 import pygame
+import os
+from colorama.ansi import clear_screen
+from pygame.event import clear
 from pygame.locals import *
-from camera_processing import process_frame, release_camera
+from camera_processing import process_frame, release_camera, initializate_cameras
+
+while(True):
+    print("\n-------------------- BREAKOUT --------------------\n")
+    print("Instruções \n \tModo 1 Jogador: \n \t\t- Cor Verde \n \tModo 2 Jogadores: \n \t\t- Cor Verde\n\t\t- Cor Azul\n")
+    num_players = int(input("Escolha o número de jogadores (1 ou 2): "))
+    print("\n-------------------- A INICIAR --------------------\n")
+
+    if(num_players < 1 and num_players > 2):
+        continue
+    else:
+        break
+        clear_console()
+
+cam, cam2 = initializate_cameras(num_players)
 
 pygame.init()
 
@@ -18,7 +35,6 @@ bg = (234, 218, 184)
 block_red = (242, 85, 96)
 block_green = (86, 174, 87)
 block_blue = (69, 177, 232)
-paddle_red = (242, 85, 96)
 paddle_green = (86, 174, 87)
 paddle_blue = (69, 177, 232)
 paddle_outline = (100, 100, 100)
@@ -90,9 +106,10 @@ class GameBall:
         if self.rect.colliderect(first_paddle.rect):
             if abs(self.rect.bottom - first_paddle.rect.top) < 5 and self.speed_y > 0:
                 self.speed_y *= -1
-        if self.rect.colliderect(second_paddle.rect):
-            if abs(self.rect.bottom - second_paddle.rect.top) < 5 and self.speed_y > 0:
-                self.speed_y *= -1
+        if cam2:
+            if self.rect.colliderect(second_paddle.rect):
+                if abs(self.rect.bottom - second_paddle.rect.top) < 5 and self.speed_y > 0:
+                    self.speed_y *= -1
 
         # Collision with blocks (check each block in the wall)
         for row in wall.blocks:
@@ -109,7 +126,7 @@ class GameBall:
         return self.game_over
 
     def draw(self):
-        pygame.draw.circle(screen, paddle_red, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad)
+        pygame.draw.circle(screen, paddle_green, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad)
         pygame.draw.circle(screen, paddle_outline, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad), self.ball_rad, 3)
 
     def reset(self, x, y):
@@ -140,7 +157,7 @@ class Wall:
     def draw_wall(self):
         for row in self.blocks:
             for block in row:
-                block_col = block_blue if block[1] == 3 else block_green if block[1] == 2 else block_red
+                block_col = block_blue if block[1] == 3 else block_red if block[1] == 2 else block_red
                 pygame.draw.rect(screen, block_col, block[0])
                 pygame.draw.rect(screen, bg, block[0], 2)
 
@@ -149,8 +166,9 @@ wall = Wall()
 wall.create_wall()
 
 # Create paddles
-first_paddle = Paddle(paddle_red)
-second_paddle = Paddle(paddle_blue)
+first_paddle = Paddle(paddle_green)
+if cam2:
+    second_paddle = Paddle(paddle_blue)
 
 # Create ball
 ball = GameBall(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
@@ -161,20 +179,25 @@ while run:
     clock.tick(fps)
 
     # Process camera input
-    object_x_red, object_x_green, object_x_blue = process_frame()
+    if cam2:
+        object_x_green, object_x_blue = process_frame(cam, cam2)
+    else:
+        object_x_green = process_frame(cam, cam2)
 
     screen.fill(bg)
 
     # Draw all objects
     wall.draw_wall()
     first_paddle.draw()
-    second_paddle.draw()
+    if cam2:
+        second_paddle.draw()
     ball.draw()
 
     if live_ball:
         # Move paddles based on detected colors
-        first_paddle.move(object_x_red)
-        second_paddle.move(object_x_blue)
+        first_paddle.move(object_x_green)
+        if cam2:
+            second_paddle.move(object_x_blue)
         game_over = ball.move()
         if game_over != 0:
             live_ball = False
@@ -182,13 +205,18 @@ while run:
     # Display instructions
     if not live_ball:
         if game_over == 0:
-            draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+            if num_players == 1:
+                draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
+                draw_text('COLOR GREEN PLAYING', font, text_col, 100, screen_height // 2 + 170)
+            else:
+                draw_text('CLICK ANYWHERE TO START, COLOR GREEN AND BLUE PLAYING', font, text_col, 100, screen_height // 2 + 100)
         elif game_over == -1:
             draw_text('GAME OVER!', font, text_col, 240, screen_height // 2 + 50)
             draw_text('CLICK ANYWHERE TO START', font, text_col, 100, screen_height // 2 + 100)
         ball.reset(first_paddle.x + (first_paddle.width // 2), first_paddle.y - first_paddle.height)
         first_paddle.reset()
-        second_paddle.reset()
+        if cam2:
+            second_paddle.reset()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -198,5 +226,5 @@ while run:
 
     pygame.display.update()
 
-release_camera()
+release_camera(cam, cam2)
 pygame.quit()
