@@ -2,21 +2,52 @@ import pygame
 from pygame.locals import *
 from camera_processing import process_frame, release_camera, initializate_cameras
 
-while(True):
-    print("\n-------------------- BREAKOUT --------------------\n")
-    print("Instruções \n \tModo 1 Jogador: \n \t\t- Cor Verde \n \tModo 2 Jogadores: \n \t\t- Cor Verde\n\t\t- Cor Azul\n")
-    num_players = int(input("Escolha o número de jogadores (1 ou 2): "))
-    print("\n-------------------- A INICIAR --------------------\n")
+pygame.init()
 
-    if(num_players < 1 and num_players > 2):
-        continue
-    else:
-        break
-        clear_console()
+screen_width = 600
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption('Breakout')
+
+font = pygame.font.SysFont('Constantia', 30)
+text_col = (78, 81, 139)
+bg = (234, 218, 184)
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+
+def menu_inicial():
+    while True:
+        screen.fill(bg)
+        draw_text("Escolha o número de jogadores:", font, text_col, 100, screen_height // 2 - 60)
+        draw_text("1 Jogador", font, text_col, 220, screen_height // 2)
+        draw_text("2 Jogadores", font, text_col, 200, screen_height // 2 + 60)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if 220 < x < 380 and screen_height // 2 < y < screen_height // 2 + 40:
+                    screen.fill(bg)
+                    draw_text("A carregar...", font, text_col, 220, screen_height // 2)
+                    pygame.display.update()
+                    return 1
+                if 200 < x < 400 and screen_height // 2 + 60 < y < screen_height // 2 + 100:
+                    screen.fill(bg)
+                    draw_text("A carregar...", font, text_col, 220, screen_height // 2)
+                    pygame.display.update()
+                    return 2
+
+num_players = menu_inicial()
+
 
 cam, cam2 = initializate_cameras(num_players)
-
-pygame.init()
 
 screen_width = 600
 screen_height = 600
